@@ -1,0 +1,28 @@
+{
+  "name": "textostat",
+  "version": "1.0.0",
+  "description": "Control your Nest by sending text messages.",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "cookie-parser": "^1.4.0",
+    "eventsource": "^0.1.6",
+    "express": "^4.13.3",
+    "express-session": "^1.12.1",
+    "immutable": "^3.7.6",
+    "openurl": "^1.1.0",
+    "passport": "^0.3.2",
+    "passport-nest": "^1.0.0",
+    "socket.io": "^1.3.7",
+    "speakeasy": "^1.0.3",
+    "twilio": "^2.8.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "firebase": "^2.3.2"
+  }
+}
