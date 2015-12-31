@@ -13,6 +13,16 @@ var Immutable = require('immutable');
 var speakeasy = require('speakeasy');
 var client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 var users = Immutable.Map();
+var _ = require('lodash');
+
+
+function sendMessage(phone_number, message, callback){
+  client.sendSms({
+    to: phone_number,
+    from: process.env.TWILIO_NUMBER,
+    body: message
+  }, callback);
+}
 
 function createUser(phone_number, code, socket) {
   if(users.get(phone_number)){
@@ -21,11 +31,8 @@ function createUser(phone_number, code, socket) {
     socket.emit('update', {message: message });
   } else {
     users = users.set(phone_number, Immutable.fromJS({code: code, verified: false}));
-    client.sendSms({
-      to: phone_number,
-      from: process.env.TWILIO_NUMBER,
-      body: 'Your verification code is: ' + code
-    }, function(twilioerr, responseData) {
+    sendMessage(phone_number, 'Your verification code is: ' + code,
+      function(twilioerr, responseData) {
       if (twilioerr) {
         users.delete(phone_number);
         socket.emit('update', {message: "Invalid phone number!"});
@@ -34,6 +41,14 @@ function createUser(phone_number, code, socket) {
       }
     });
   }
+}
+
+
+function registerDataRef(){
+  dataRef.on('value', function (snapshot) {
+    var data = snapshot.val();
+    thermostat_names = _.map(data.devices.thermostats, function(thermostat){return thermostat.name});
+  });
 }
 
 // Change for production apps.
@@ -45,6 +60,9 @@ var NEST_API_URL = 'https://developer-api.nest.com';
 var passportOptions = {
   failureRedirect: '/auth/failure'
 };
+
+var dataRef;
+var thermostat_names;
 
 passport.use(new NestStrategy({
   clientID: process.env.NEST_ID,
@@ -105,6 +123,12 @@ app.get('/auth/nest', passport.authenticate('nest', passportOptions));
 app.get('/auth/nest/callback', passport.authenticate('nest', passportOptions),
   function(req, res) {
     var token = req.user.accessToken;
+    if(token){
+      dataRef = new Firebase('wss://developer-api.nest.com');
+      dataRef.auth(token);
+      registerDataRef();
+    }
+
     res.redirect('/');
   });
 
@@ -112,8 +136,21 @@ app.get('/auth/failure', function(req, res) {
   res.send('Authentication failed. Please try again.');
 });
 
+app.post('/sms', function(req, res) {
+  var phone_number = req.body.From;
+  var content = req.body.Body.split(' ');
 
-app.post('/phone_number', function(req, res) {
+  var actionMap = {
+    set: function(){
+
+    },
+    view: function(){
+      sendMessage(phone_number, thermostat_names.join(' '), function(){});
+    }
+  };
+
+  actionMap[content[0]]();
+
   console.log(req);
   res.sendStatus(200);
 });
@@ -140,6 +177,7 @@ io.sockets.on('connection', function(socket) {
     }
   });
 });
+
 
 server.listen(port);
 

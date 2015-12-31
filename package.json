@@ -9,6 +9,7 @@
     "express": "^4.13.3",
     "express-session": "^1.12.1",
     "immutable": "^3.7.6",
+    "lodash": "^3.10.1",
     "openurl": "^1.1.0",
     "passport": "^0.3.2",
     "passport-nest": "^1.0.0",
