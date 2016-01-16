@@ -138,20 +138,25 @@ app.get('/auth/failure', function(req, res) {
 
 app.post('/sms', function(req, res) {
   var phone_number = req.body.From;
-  var content = req.body.Body.split(' ');
+  var content = req.body.Body;
+  var setValidMatch = /set([\s]+)(["'])(\\?.)*?\2\1to\1([\d]+)/ig;
+  var viewValidMatch = /view([\s]+)thermostats/ig;
 
-  var actionMap = {
-    set: function(){
 
-    },
-    view: function(){
-      sendMessage(phone_number, thermostat_names.join(' '), function(){});
-    }
-  };
+  if(content.match(setValidMatch)){
+    //grab whatever is in the quotes and then strip it
+    var thermostatName = _.first(content.match(/(["'])(\\?.)*?\1/));
+    thermostatName = thermostatName.substr(1, thermostatName.length - 2);
+    var temperature = _.last(content.match(/"([\s]+)to\1([\d]+)/));
+    setTemperature(thermostatName, _.toInteger(temperature));
+  }
+  else if(content.match(viewValidMatch)){
+    sendMessage(phone_number, thermostat_names.join(' '), function(){});
+  }
+  else {
+    //default
+  }
 
-  actionMap[content[0]]();
-
-  console.log(req);
   res.sendStatus(200);
 });
 
