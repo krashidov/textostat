@@ -4,6 +4,7 @@
   "description": "Control your Nest by sending text messages.",
   "dependencies": {
     "body-parser": "^1.14.2",
+    "connect-assets": "^5.1.0",
     "connect-mongo": "^1.1.0",
     "cookie-parser": "^1.4.0",
     "dotenv": "^1.2.0",
@@ -11,7 +12,7 @@
     "express": "^4.13.3",
     "express-session": "^1.12.1",
     "immutable": "^3.7.6",
-    "lodash": "^3.10.1",
+    "lodash": "^4.1.0",
     "mongoose": "^4.3.6",
     "openurl": "^1.1.0",
     "passport": "^0.3.2",
@@ -27,6 +28,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "firebase": "^2.3.2"
+    "firebase": "^2.3.2",
+    "mocha": "^2.3.4",
+    "sinon": "^1.17.2",
+    "supertest": "^1.1.0"
   }
 }

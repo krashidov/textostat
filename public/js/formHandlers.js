@@ -8,24 +8,23 @@ function showVerificationScreen(){
 $(function(){
   $('#register_number').on('click', function (event) {
     event.preventDefault();
-    socket.emit("register", {
-      phone_number: $("#phone_number").val()
+    $.post('/register', { phone_number: $("#phone_number").val() }).done(function(data, status, response){
+      if(response.status === 200){
+        showVerificationScreen();
+      }
     });
   });
 
   $('#verify_code').on('click', function (event) {
     event.preventDefault();
-    socket.emit("verify", {
-      verification_code: $("#verification_code").val(),
-      phone_number: $("#phone_number").val()
+    $.post('/verify',
+      {
+        phone_number: $("#phone_number").val(),
+        verification_code: $("#verification_code").val()
+      }).done(function (data, status, response) {
+      if (response.status === 200) {
+        alert('verified!');
+      }
     });
-  });
-
-  socket.on('code_generated', function() {
-    showVerificationScreen();
-  });
-
-  socket.on('verification_successful', function() {
-    console.log('verified!');
   });
 });

@@ -3,7 +3,7 @@ var client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH_T
 
 module.exports = {
   sendMessage: function(phone_number, message, callback){
-    client.sendSms({
+    client.messages.create({
       to: phone_number,
       from: process.env.TWILIO_NUMBER,
       body: message
