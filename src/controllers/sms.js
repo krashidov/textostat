@@ -35,7 +35,7 @@ function setTemperature(dataRef, thermostat, newTemp) {
 }
 
 
-function registerDataRef(dataRef, content, phone_number){
+function registerDataRef(dataRef, content, phone_number, res){
   var callCount = 0;
   dataRef.on('value', function (snapshot) {
     if (callCount > 0){
@@ -66,13 +66,9 @@ function registerDataRef(dataRef, content, phone_number){
      */
     else if(content.match(setFirstThermostatMatch)){
       thermostat = thermostats[Object.keys(thermostats)[0]];
-      temperature = _.last(content.match(/([\s]+)\1+to\1+([\d]+)/i));
+      temperature = _.last(content.match(/([\s]+)to\1+([\d]+)/i));
       sendMessage(phone_number, setTemperature(dataRef, thermostat, temperature));
     }
-    /*
-     Set the first thermostat's temperature
-     Example match: view thermostats
-     */
     else if (content.match(viewThermostatMatch)) {
       var thermostat_names = _.map(data.devices.thermostats, function (thermostat) {
         var temperatureScale = thermostat['temperature_scale'].toLowerCase();
@@ -83,11 +79,8 @@ function registerDataRef(dataRef, content, phone_number){
 
       sendMessage(phone_number, thermostat_names.join('\n\n'));
     }
-    /*
-    show examples
-     */
     else if (content.match(exampleMatch)) {
-      var message = [
+      message = [
         'Set a specific Thermostat temp: Set "Thermostat name" to 75 degrees',
         'Set the first Thermostat temp: Set temperature to 75 degrees',
         'View thermostat names: view thermostats',
@@ -106,6 +99,7 @@ function registerDataRef(dataRef, content, phone_number){
     else {
       sendMessage(phone_number, INVALID_INPUT_RESPONSE);
     }
+    res.sendStatus(200);
   });
 }
 
@@ -120,10 +114,9 @@ module.exports = {
         var token = existingUser.token;
         var dataRef = new Firebase('wss://developer-api.nest.com');
         dataRef.authWithCustomToken(token, function() {
-          registerDataRef(dataRef, content, phone_number);
+          registerDataRef(dataRef, content, phone_number, res);
         });
       }
     });
-    res.sendStatus(200);
   }
 };

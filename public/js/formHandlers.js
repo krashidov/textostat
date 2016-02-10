@@ -1,8 +1,12 @@
-var socket = io.connect();
 
 function showVerificationScreen(){
   $('#register_form').fadeOut();
   $('#verify_form').fadeIn();
+}
+
+function showCompletionScreen(){
+  $('#verify_form').fadeOut();
+  $('#verified').fadeIn();
 }
 
 $(function(){
@@ -23,7 +27,7 @@ $(function(){
         verification_code: $("#verification_code").val()
       }).done(function (data, status, response) {
       if (response.status === 200) {
-        alert('verified!');
+        showCompletionScreen();
       }
     });
   });

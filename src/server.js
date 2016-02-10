@@ -61,20 +61,21 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, '../public')));
 app.use(function(req, res, next) {
   res.locals.user = req.user;
   next();
 });
 
-app.get('/auth/nest');
-app.get('/auth/nest/callback', nestController.callback);
+app.get('/auth/nest', passport.authenticate('nest', passportOptions));
+app.get('/auth/nest/callback', passport.authenticate('nest', passportOptions), nestController.callback);
 app.get('/auth/failure', nestController.failure);
 
+app.get('/', passportConfiguration.isAuthenticated);
 app.post('/sms', smsController.smsHandler);
-app.post('/register', userController.handleRegister);
+app.post('/register', passportConfiguration.isAuthenticated, userController.handleRegister);
 app.post('/verify', passportConfiguration.isAuthenticated, userController.handleVerify);
 
+app.use(express.static(path.join(__dirname, '../public')));
 app.set('port', process.env.PORT || 3000);
 app.listen(app.get('port'), function() {
   console.log('Please click Accept in the browser window that just opened.');
