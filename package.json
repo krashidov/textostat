@@ -11,6 +11,7 @@
     "eventsource": "^0.1.6",
     "express": "^4.13.3",
     "express-session": "^1.12.1",
+    "firebase": "^2.4.0",
     "immutable": "^3.7.6",
     "lodash": "^4.1.0",
     "mongoose": "^4.3.6",
@@ -28,7 +29,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "firebase": "^2.3.2",
     "mocha": "^2.3.4",
     "mockfirebase": "^0.12.0",
     "should": "^8.2.1",
