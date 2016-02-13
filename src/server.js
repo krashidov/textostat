@@ -30,7 +30,7 @@ var userController = require('./controllers/user');
 /**
  * Passport Configuration
  */
-var passportConfiguration = require('./passPortConfig.js');
+var passportConfiguration = require('./passportConfig.js');
 
 var app = express();
 
