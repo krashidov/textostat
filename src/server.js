@@ -12,10 +12,12 @@ var mongoose = require('mongoose');
 var MongoStore = require('connect-mongo/es5')(session);
 
 /**
- * Configure environment
+ * Configure dev environment, otherwise we will use heroku vars
  */
-var dotenv= require('dotenv');
-dotenv.load({ path: '.env' });
+if(process.env.DEV_MODE) {
+  var dotenv= require('dotenv');
+  dotenv.load({ path: '.env' });
+}
 
 /**
  * Controllers
