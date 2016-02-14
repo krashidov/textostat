@@ -1,6 +1,7 @@
 var speakeasy = require('speakeasy');
 var User = require('../models/User');
 var sendMessage = require('../utils/twilio').sendMessage;
+var examplesMessage = require('../utils/constants').examplesMessage;
 
 function messageCallback(twilioerr, res) {
   if (twilioerr) {
@@ -17,16 +18,14 @@ function normalizeNumber(number) {
 }
 
 module.exports = {
-  handleRegister: function (req, res, next) {
+  handleRegister: function (req, res) {
     var code = speakeasy.totp({key: 'abc123'});
     var phone_number = normalizeNumber(req.body.phone_number);
     var user = new User({
       verification_code: code,
       phone_number: phone_number
     });
-    console.log(user);
     return User.findOne({phone_number: phone_number}, function (err, existingUser) {
-      console.log('here');
       if (existingUser) {
         existingUser.verification_code = code;
         existingUser.save(function (err) {
@@ -59,7 +58,7 @@ module.exports = {
           if(err){
             return next(err);
           }
-          sendMessage(phone_number, 'You are now verified! Send \'show examples\' to see usage examples.');
+          sendMessage(phone_number, 'You are now verified! Here\'s how to interact with Textostat\n\n'.concat(examplesMessage));
           res.sendStatus(200);
         });
       } else {

@@ -2,8 +2,8 @@ var sendMessage = require('../utils/twilio').sendMessage;
 var Firebase = require('firebase');
 var _ = require('lodash');
 var User = require('../models/User');
-
-var INVALID_INPUT_RESPONSE = 'Your input was invalid. Please send \'show examples\' to see example inputs.';
+var invalidUsageMessage = require('../utils/constants').invalidInputMessage;
+var examplesMessage = require('../utils/constants').examplesMessage;
 
 function findThermostatByName(thermostats, name){
   return _.find(thermostats, function(thermostat){
@@ -42,67 +42,67 @@ function registerDataRef(dataRef, content, phone_number, res){
       return;
     }
     callCount += 1;
-    var data = snapshot.val();
-    var setSpecificThermostatMatch = /set([\s]+)(["'])(\\?.)*?\2\1+to\1+([\d]+)/ig;
-    var setFirstThermostatMatch = /set([\s]+)temperature\1+to\1+([\d]+)/ig;
-    var viewThermostatMatch = /view([\s]+)thermostats/ig;
-    var unauthorizedMatch = /unauthorized/ig;
-    var exampleMatch = /show examples/ig;
-    var thermostats = data.devices.thermostats;
-    var temperature, thermostat, message;
-
-    /*
-     Example match: set "Bedroom Thermostat" to 45 degrees
-     */
-    if (content.match(setSpecificThermostatMatch)) {
-      var thermostatName = _.first(content.match(/(["'])(\\?.)*?\1/));
-      thermostatName = thermostatName.substr(1, thermostatName.length - 2);
-      temperature = _.last(content.match(/"([\s]+)\1+to\1+([\d]+)/i));
-      thermostat = findThermostatByName(thermostats, thermostatName);
-      sendMessage(phone_number, setTemperature(dataRef, thermostat, temperature));
-    }
-    /*
-     Example match: set temperature to 45 degrees
-     */
-    else if(content.match(setFirstThermostatMatch)){
-      thermostat = thermostats[Object.keys(thermostats)[0]];
-      temperature = _.last(content.match(/([\s]+)to\1+([\d]+)/i));
-      sendMessage(phone_number, setTemperature(dataRef, thermostat, temperature));
-    }
-    else if (content.match(viewThermostatMatch)) {
-      var thermostat_names = _.map(data.devices.thermostats, function (thermostat) {
-        var temperatureScale = thermostat['temperature_scale'].toLowerCase();
-        return thermostat.name + ' currently at a temperature of ' +
-          thermostat['target_temperature_' + temperatureScale] +
-          ' degrees ' + temperatureScale.toUpperCase();
-      });
-
-      sendMessage(phone_number, thermostat_names.join('\n\n'));
-    }
-    else if (content.match(exampleMatch)) {
-      message = [
-        'Set a specific Thermostat temp: Set "Thermostat name" to 75 degrees',
-        'Set the first Thermostat temp: Set temperature to 75 degrees',
-        'View thermostat names: view thermostats',
-        'To unauthorize this phone number: unauthorize',
-        'View this help message: help'
-      ].join('\n\n');
-      sendMessage(phone_number, message);
-    }
-    else if (content.match(unauthorizedMatch)) {
-      User.remove({ phone_number: phone_number}, function(err){
-        if(!err){
-          sendMessage(phone_number, 'This number can no longer interact with your thermostats');
-        }
-      })
-    }
-    else {
-      sendMessage(phone_number, INVALID_INPUT_RESPONSE);
-    }
-    res.sendStatus(200);
+    parseSMSMessage(snapshot, content, phone_number, res);
   });
 }
 
+function getTemperature(content){
+  return _.last(content.match(/([\s]+)to\1+([\d]+)/i));
+}
+
+function parseSMSMessage(dataRef, snapshot, content, phone_number, res){
+  var data = snapshot.val();
+  var setSpecificThermostatMatch = /set([\s]+)+(["'])(\\?.)*?\2\1+to\1+([\d]+)/ig;
+  var setFirstThermostatMatch = /set([\s]+)+temperature\1+to\1+([\d]+)/ig;
+  var viewThermostatMatch = /view([\s]+)+thermostats/ig;
+  var unauthorizedMatch = /unauthorized/ig;
+  var exampleMatch = /show examples/ig;
+  var thermostats = data.devices.thermostats;
+  var temperature, thermostat, message;
+
+  /*
+   Example match: set "Bedroom Thermostat" to 45 degrees
+   */
+  if (content.match(setSpecificThermostatMatch)) {
+    var thermostatName = _.first(content.match(/(["'])(\\?.)*?\1/));
+    thermostatName = thermostatName.substr(1, thermostatName.length - 2);
+    temperature = getTemperature(content);
+    thermostat = findThermostatByName(thermostats, thermostatName);
+    sendMessage(phone_number, setTemperature(dataRef, thermostat, temperature));
+  }
+  /*
+   Example match: set temperature to 45 degrees
+   */
+  else if(content.match(setFirstThermostatMatch)){
+    thermostat = thermostats[Object.keys(thermostats)[0]];
+    temperature = getTemperature(content);
+    sendMessage(phone_number, setTemperature(dataRef, thermostat, temperature));
+  }
+  else if (content.match(viewThermostatMatch)) {
+    var thermostat_names = _.map(data.devices.thermostats, function (thermostat) {
+      var temperatureScale = thermostat.temperature_scale.toLowerCase();
+      return thermostat.name + ' currently at a temperature of ' +
+        thermostat['target_temperature_' + temperatureScale] +
+        ' degrees ' + temperatureScale.toUpperCase();
+    });
+
+    sendMessage(phone_number, thermostat_names.join('\n\n'));
+  }
+  else if (content.match(exampleMatch)) {
+    sendMessage(phone_number, examplesMessage);
+  }
+  else if (content.match(unauthorizedMatch)) {
+    User.remove({ phone_number: phone_number}, function(err){
+      if(!err){
+        sendMessage(phone_number, 'This number can no longer interact with your thermostats');
+      }
+    })
+  }
+  else {
+    sendMessage(phone_number, invalidUsageMessage);
+  }
+  res.sendStatus(200);
+}
 
 
 module.exports = {
@@ -118,5 +118,6 @@ module.exports = {
         });
       }
     });
-  }
+  },
+  parseSMSMessage: parseSMSMessage
 };

@@ -1,24 +1,30 @@
 <html>
-    <head>
-        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-        <script type="text/javascript" src="js/formHandlers.js"></script>
-    </head>
+<head>
+    <link rel="stylesheet" href="css/style.css">
+</head>
 <body>
+    <h2 class="header">Textostat: Control Nest with text messages!</h2>
     <form id="register_form">
-        Please insert the phone number that you want to use for your nest:
-        <input id="phone_number" type="number">
-        <input id="register_number" type="submit">
+        <label>Please insert the phone number that you want to use for your nest:</label>
+        <div class="number-wrapper">
+            <span class="country-code">+1</span><input id="phone_number">
+            <input class="btn" id="register_number" type="submit">
+        </div>
     </form>
 
     <form id="verify_form" style="display: none;">
-        Please type in the verification code that was sent to your number
-        <input id="verification_code" type="number">
-        <input id="verify_code" type="submit">
+        <label>Please type in the verification code that was sent to your number</label>
+        <div class="number-wrapper">
+            <input id="verification_code">
+            <input class="btn" id="verify_code" type="submit">
+        </div>
     </form>
 
     <div id="verified" style="display: none;">
-        Congratulations! You are now verified!
-        Send
+        <p class="success"> Congratulations! You are now verified!
+        <br>Send 'Show examples' to the number that texted you.</p>
     </div>
 </body>
+    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/formHandlers.js"></script>
 </html>

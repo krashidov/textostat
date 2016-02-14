@@ -4,17 +4,13 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var session = require('express-session');
-var openurl = require('openurl');
-var Immutable = require('immutable');
-var users = Immutable.Map();
-var _ = require('lodash');
 var mongoose = require('mongoose');
 var MongoStore = require('connect-mongo/es5')(session);
 
 /**
  * Configure dev environment, otherwise we will use heroku vars
  */
-if(process.env.DEV_MODE) {
+if(process.env.TEXTOSTAT_DEV_MODE) {
   var dotenv= require('dotenv');
   dotenv.load({ path: '.env' });
 }
@@ -43,8 +39,6 @@ mongoose.connection.on('error', function() {
   console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
   process.exit(1);
 });
-
-var NEST_API_URL = 'https://developer-api.nest.com';
 
 var passportOptions = {
   failureRedirect: '/auth/failure'
@@ -80,7 +74,7 @@ app.post('/verify', passportConfiguration.isAuthenticated, userController.handle
 app.use(express.static(path.join(__dirname, '../public')));
 app.set('port', process.env.PORT || 3000);
 app.listen(app.get('port'), function() {
-  console.log('Please click Accept in the browser window that just opened.');
+  console.log('Textostat running.');
 });
 
 module.exports = app;

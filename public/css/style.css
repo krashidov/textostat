@@ -1,0 +1,51 @@
+html {
+  font: 1.4rem "Open Sans", sans-serif;
+  color: #4D4946;
+}
+
+label {
+  text-align: center;
+  display: block;
+}
+
+.number-wrapper {
+  text-align: center;
+}
+
+input {
+    line-height: 1.4rem;
+    border: 0.1rem #00b3ee solid;
+    border-radius: 0.2rem;
+    font-size: 1rem;
+    margin: 0.5rem;
+}
+
+.header,
+.success {
+    text-align: center;
+}
+
+.btn {
+    margin: 1rem auto;
+    position: relative;
+    color: #4D4946;
+    background: white;
+    display: block;
+    text-align: center;
+}
+
+.btn:hover {
+    color: #4D4946;
+    background: #eeeeff;
+    display: block;
+    text-align: center;
+}
+
+.btn:active {
+    color: #4D4946;
+    background: #eeeeff;
+    display: block;
+    text-align: center;
+    border-color: black;
+}
+
