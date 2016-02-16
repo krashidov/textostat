@@ -19,7 +19,7 @@ function setTemperature(dataRef, thermostat, newTemp) {
     return 'No thermostat with this name was found.';
   }
   if( !newTemp) {
-    return INVALID_INPUT_RESPONSE;
+    return invalidUsageMessage;
   }
 
   newTemp = _.toInteger(newTemp);
@@ -50,7 +50,7 @@ function getTemperature(content){
   return _.last(content.match(/([\s]+)to\1+([\d]+)/i));
 }
 
-function parseSMSMessage(dataRef, snapshot, content, phone_number, res){
+function parseSMSMessage(dataRef, snapshot, content, phone_number, res, unAuthCallback){
   var data = snapshot.val();
   var setSpecificThermostatMatch = /set([\s]+)+(["'])(\\?.)*?\2\1+to\1+([\d]+)/ig;
   var setFirstThermostatMatch = /set([\s]+)+temperature\1+to\1+([\d]+)/ig;
@@ -58,7 +58,7 @@ function parseSMSMessage(dataRef, snapshot, content, phone_number, res){
   var unauthorizedMatch = /unauthorized/ig;
   var exampleMatch = /show examples/ig;
   var thermostats = data.devices.thermostats;
-  var temperature, thermostat, message;
+  var temperature, thermostat;
 
   /*
    Example match: set "Bedroom Thermostat" to 45 degrees
@@ -95,8 +95,11 @@ function parseSMSMessage(dataRef, snapshot, content, phone_number, res){
     User.remove({ phone_number: phone_number}, function(err){
       if(!err){
         sendMessage(phone_number, 'This number can no longer interact with your thermostats');
+        if(unAuthCallback) {
+          unAuthCallback();
+        }
       }
-    })
+    });
   }
   else {
     sendMessage(phone_number, invalidUsageMessage);

@@ -5,6 +5,6 @@ module.exports = {
     'Set the first Thermostat temp: Set temperature to 75 degrees',
     'View thermostat names: view thermostats',
     'To unauthorize this phone number: unauthorize',
-    'View this help message: help'
+    'View this help message: show examples'
   ].join('\n\n')
 };

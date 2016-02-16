@@ -5,6 +5,9 @@ var sendMessageStub = sinon.stub();
 var setTemperatureSpy = sinon.spy();
 var examplesMessage = require('../src/utils/constants').examplesMessage;
 var invalidInputMessage = require('../src/utils/constants').invalidInputMessage;
+var User = require('../src/models/User');
+var mongoose = require('mongoose');
+mongoose.connect(process.env.MONGODB);
 
 var dataRef = {
   child: function() {
@@ -13,6 +16,8 @@ var dataRef = {
     }
   }
 };
+
+
 
 var snapshot = {
   val: function () {
@@ -116,5 +121,21 @@ describe('POST /verify', function() {
     parseSMSMessage(dataRef, snapshot, content, phone_number, res);
     expect(sendMessageStub.lastCall.args[0].body).to.equal(invalidInputMessage);
     done();
+  });
+
+  it('unauthorize a user', function(done) {
+    var user = new User({ phone_number: phone_number });
+
+    user.save(function(err) {
+      var content = 'unauthorized';
+      parseSMSMessage(dataRef, snapshot, content, phone_number, res, function() {
+        User.findOne({ phone_number: phone_number }, function(err, existingUser) {
+          if (!existingUser) {
+            expect(sendMessageStub.lastCall.args[0].body).to.equal('This number can no longer interact with your thermostats');
+            done();
+          }
+        })
+      });
+    });
   });
 });

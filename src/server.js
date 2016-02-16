@@ -1,5 +1,13 @@
 var path = require('path');
 
+/**
+ * Configure dev environment, otherwise we will use heroku vars
+ */
+if(process.env.TEXTOSTAT_ENVIRONMENT === 'DEV') {
+  var dotenv= require('dotenv');
+  dotenv.load({ path: '.env' });
+}
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var passport = require('passport');
@@ -7,13 +15,6 @@ var session = require('express-session');
 var mongoose = require('mongoose');
 var MongoStore = require('connect-mongo/es5')(session);
 
-/**
- * Configure dev environment, otherwise we will use heroku vars
- */
-if(process.env.TEXTOSTAT_DEV_MODE) {
-  var dotenv= require('dotenv');
-  dotenv.load({ path: '.env' });
-}
 
 /**
  * Controllers

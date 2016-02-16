@@ -4,8 +4,8 @@
   "description": "Control your Nest by sending text messages.",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "TEXTOSTAT_DEV_MODE=true node src/server.js",
-    "test": "TEXTOSTAT_DEV_MODE=true mocha"
+    "dev": "TEXTOSTAT_ENVIRONMENT=DEV node src/server.js",
+    "test": "MONGODB=mongodb://localhost:27017/test mocha"
   },
   "dependencies": {
     "body-parser": "^1.14.2",
