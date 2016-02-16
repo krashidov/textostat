@@ -42,7 +42,7 @@ function registerDataRef(dataRef, content, phone_number, res){
       return;
     }
     callCount += 1;
-    parseSMSMessage(snapshot, content, phone_number, res);
+    parseSMSMessage(dataRef, snapshot, content, phone_number, res);
   });
 }
 
