@@ -55,7 +55,7 @@ function parseSMSMessage(dataRef, snapshot, content, phone_number, res, unAuthCa
   var setSpecificThermostatMatch = /set([\s]+)+(["'])(\\?.)*?\2\1+to\1+([\d]+)/ig;
   var setFirstThermostatMatch = /set([\s]+)+temperature\1+to\1+([\d]+)/ig;
   var viewThermostatMatch = /view([\s]+)+thermostats/ig;
-  var unauthorizedMatch = /unauthorized/ig;
+  var unauthorizedMatch = /unauthorize/ig;
   var exampleMatch = /show examples/ig;
   var thermostats = data.devices.thermostats;
   var temperature, thermostat;

@@ -127,7 +127,7 @@ describe('POST /verify', function() {
     var user = new User({ phone_number: phone_number });
 
     user.save(function(err) {
-      var content = 'unauthorized';
+      var content = 'unauthorize';
       parseSMSMessage(dataRef, snapshot, content, phone_number, res, function() {
         User.findOne({ phone_number: phone_number }, function(err, existingUser) {
           if (!existingUser) {
